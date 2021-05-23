@@ -1,6 +1,6 @@
 {
   "name": "binaryarray.js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A minimal-memory array for binary values",
   "main": "BinaryArray.js",
   "scripts": {
@@ -12,6 +12,7 @@
   },
   "keywords": [
     "binary",
+    "bits",
     "array"
   ],
   "author": "Samuel H.E. Larsson",
