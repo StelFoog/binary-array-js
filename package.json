@@ -1,0 +1,26 @@
+{
+  "name": "binaryarray.js",
+  "version": "0.1.0",
+  "description": "A minimal-memory array for binary values",
+  "main": "BinaryArray.js",
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha test/*.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/StelFoog/binary-array-js.git"
+  },
+  "keywords": [
+    "binary",
+    "array"
+  ],
+  "author": "Samuel H.E. Larsson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/StelFoog/binary-array-js/issues"
+  },
+  "homepage": "https://github.com/StelFoog/binary-array-js#readme",
+  "devDependencies": {
+    "mocha": "^8.3.0"
+  }
+}

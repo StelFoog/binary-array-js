@@ -1,0 +1,10 @@
+# No system files
+.DS_STORE
+
+# No project files
+.github
+TODO.md
+
+# Only mocha test files
+test/*
+!test/*.test.js

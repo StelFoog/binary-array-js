@@ -3,8 +3,6 @@ const { isInteger } = Number;
 const badInputRet = undefined;
 const Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array;
 
-module.exports = BinaryArray;
-
 // Manages bits in a byte array
 class BinaryArray {
 	constructor(targetSize) {
@@ -15,8 +13,10 @@ class BinaryArray {
 	}
 
 	_setBitAt(bit, index) {
+		// console.log(index, ' – ', 7 - (index % 8));
+		// console.log();
 		const sec = floor(index / 8);
-		if (bit) this.arr[sec] = this.arr[sec] || 1 << (7 - (index % 8));
+		if (bit) this.arr[sec] = this.arr[sec] | (1 << (7 - (index % 8)));
 		else this.arr[sec] = this.arr[sec] & ~(1 << (7 - (index % 8)));
 	}
 
@@ -38,6 +38,7 @@ class BinaryArray {
 	appendBits(bits) {
 		if (typeof bits === 'boolean' && this.bitsSet < this.size) {
 			this._setBitAt(bits ? 1 : 0, this.bitsSet);
+			// console.log(this.arr[0].toString(2));
 			// arr[floor(this.bitsSet / 8)] =
 			// 	arr[floor(this.bitsSet / 8)] || (bits ? 1 : 0) << (7 - (this.bitsSet % 8));
 			this.bitsSet++;
@@ -51,6 +52,10 @@ class BinaryArray {
 		} else return badInputRet;
 
 		return this.bitsSet - 1;
+	}
+
+	append(bits) {
+		return this.appendBits(bits);
 	}
 
 	// sets a bit at given index, returns the bit that was there before
@@ -67,44 +72,56 @@ class BinaryArray {
 		return this._getBitAt(index);
 	}
 
-	get byteArray() {
-		return this.arr;
-	}
-
-	get bitsSet() {
-		return this.bitsSet;
-	}
-
-	iterator() {
-		return BinaryListIterator(this);
+	iterator(everyBit) {
+		return new BinaryArrayIterator(this, everyBit);
 	}
 }
 
-class BinaryListIterator {
-	constructor(binaryList) {
-		this.arr = new Arr(binaryList.size / 8).set(binaryList.byteArray);
-		this.bitsSet = binaryList.bitsSet;
+class BinaryArrayIterator {
+	constructor(binaryArray, everyBit) {
+		this.arr = new Arr(binaryArray.size / 8);
+		this.arr.set(binaryArray.arr);
+		this.length = everyBit ? binaryArray.size : binaryArray.bitsSet;
 		this.currentBit = 0;
 	}
 
 	_takeNextBit() {
-		return (arr[floor(this.currentBit / 8)] >> (7 - (this.currentBit % 8))) & 1;
+		return (this.arr[floor(this.currentBit / 8)] >> (7 - (this.currentBit % 8))) & 1;
 	}
 
 	nextBit() {
-		if (this.currentBit >= this.bitsSet) return false;
+		if (this.currentBit >= this.length) return badInputRet;
 		const bit = this._takeNextBit();
 		this.currentBit++;
 		return bit;
 	}
 
-	nextBits(reqBits) {
-		if (reqBits && typeof reqBits !== 'number') return badInputRet;
+	nextBits(requestedBits) {
+		if (requestedBits && typeof requestedBits !== 'number') return badInputRet;
 		var bits = '';
-		for (let i = 0; i < reqBits; i++) {
-			if (this.currentBit >= this.bitsSet) return false;
+		for (let i = 0; i < requestedBits; i++) {
+			if (this.currentBit >= this.length) break;
 			bits += this._takeNextBit();
 			this.currentBit++;
 		}
+		return bits;
+	}
+
+	next() {
+		return { value: this.nextBit(), done: this.done };
+	}
+
+	reset() {
+		this.currentBit = 0;
+	}
+
+	get bitsLeft() {
+		return this.length - this.currentBit;
+	}
+
+	get done() {
+		return this.bitsLeft ? false : true;
 	}
 }
+
+module.exports = BinaryArray;
