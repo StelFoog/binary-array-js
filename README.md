@@ -1,5 +1,10 @@
 # BinaryArray.js
 
+[![npm](https://img.shields.io/npm/v/binaryarray.js)](https://img.shields.io/npm/v/binaryarray.js)
+[![npm bundle size](https://img.shields.io/bundlephobia/min/binaryarray.js)](https://www.npmjs.com/package/binaryarray.js)
+[![GitHub last commit](https://img.shields.io/github/last-commit/StelFoog/binary-array-js)](https://github.com/StelFoog/binary-array-js)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/StelFoog/binary-array-js/Node.js%20CI?label=tests)](https://github.com/StelFoog/binary-array-js/actions)
+
 BinaryArray.js is an array of binary bits for JavaScript.
 
 ## Usage
