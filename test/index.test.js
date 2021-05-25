@@ -7,7 +7,10 @@ let startValue;
 let iterator;
 
 function expectedSize() {
-	const size = startValue.length;
+	return eightAlignedSize(startValue.length);
+}
+
+function eightAlignedSize(size) {
 	return size % 8 ? size + 8 - (size % 8) : size;
 }
 
@@ -133,6 +136,105 @@ describe('Created and values set properly', () => {
 		assert.strictEqual(arr.size, expectedSize());
 		assert.strictEqual(arr.bitsSet, startValue.length);
 		assert.strictEqual(arr.arr[0] >> 4, parseInt(startValue, 2));
+	});
+
+	it('Appending Uint8Array', () => {
+		startValue = '10110001010001001110101001010110';
+		assert.strictEqual(startValue.length, 32);
+		const startArray = new Uint8Array(4);
+		const spltValue = splitToEigths();
+		for (let i = 0; i < spltValue.length; i++) startArray[i] = parseInt(spltValue[i], 2);
+
+		initNoValue();
+		arr.append(startArray);
+		for (let i = 0; i < 4; i++) assert.strictEqual(arr.arr[i], startArray[i]);
+		assert.strictEqual(arr.size, expectedSize());
+		assert.strictEqual(arr.bitsSet, startValue.length);
+	});
+
+	it('Appending array', () => {
+		startValue = '10110001010001001110101001010110';
+		assert.strictEqual(startValue.length, 32);
+		const startArray = [];
+		const spltValue = splitToEigths();
+		for (let i = 0; i < spltValue.length; i++) startArray.push(parseInt(spltValue[i], 2));
+
+		initNoValue();
+		arr.append(startArray);
+		for (let i = 0; i < 4; i++) assert.strictEqual(arr.arr[i], startArray[i]);
+		assert.strictEqual(arr.size, expectedSize());
+		assert.strictEqual(arr.bitsSet, startValue.length);
+	});
+});
+
+describe('Appending bits gives correct errors', () => {
+	it('Setting too bits for the length of array is prevented, boolean', () => {
+		startValue = '101101000110';
+		const originalLength = eightAlignedSize(startValue.length);
+		initNoValue();
+		startValue += '10100101101101';
+		for (let i = 0; i <= originalLength; i++) {
+			assert.strictEqual(
+				arr.appendBits(startValue.charAt(i) === '1'),
+				i < originalLength ? i : undefined
+			);
+		}
+		assert.strictEqual(arr.size, expectedSize() - 16);
+		assert.strictEqual(arr.bitsSet, arr.size);
+	});
+
+	it('Setting too bits for the length of array is prevented, string', () => {
+		startValue = '101101000110';
+		initNoValue();
+		startValue += '10100101101101';
+		assert.strictEqual(arr.appendBits(startValue), undefined);
+		assert.strictEqual(arr.size, expectedSize() - 16);
+		assert.strictEqual(arr.bitsSet, 0);
+	});
+
+	it('Setting too bits for the length of array is prevented, number', () => {
+		startValue = '101101000110';
+		initNoValue();
+		startValue += '10100101101101';
+		assert.strictEqual(arr.appendBits(parseInt(startValue, 2)), undefined);
+		assert.strictEqual(arr.size, expectedSize() - 16);
+		assert.strictEqual(arr.bitsSet, 0);
+	});
+
+	it('Appending string not all 1s and 0s prevented', () => {
+		startValue = '101101020110';
+		initNoValue();
+		const test = arr.append(startValue);
+		console.log(test);
+		// assert.strictEqual(arr.append(startValue), undefined);
+	});
+
+	it('Appending negative or too high number prevented', () => {
+		// negative
+		let startNumber = -1;
+		arr = new BinaryArray(8);
+		assert.strictEqual(arr.append(startNumber), undefined);
+		// too high
+		startNumber = 300;
+		arr = new BinaryArray(8);
+		assert.strictEqual(arr.append(startNumber), undefined);
+	});
+
+	it('Appending array not all numbers prevented', () => {
+		arr = new BinaryArray(32);
+		let startArray = [92, 3, 'a', false];
+		assert.strictEqual(arr.append(startArray), undefined);
+	});
+
+	it('Appending array numbers below 0 or too high prevented', () => {
+		// below 0
+		arr = new BinaryArray(32);
+		let startArray = [92, 3, -2, 243];
+		assert.strictEqual(arr.append(startArray), undefined);
+		// too high
+		arr = new BinaryArray(32);
+		startArray = [92, 3, 396, 243];
+		assert.strictEqual(arr.append(startArray), undefined);
 	});
 });
 
@@ -322,3 +424,6 @@ describe('Iterator', () => {
 		}
 	});
 });
+
+// TODO:
+//
